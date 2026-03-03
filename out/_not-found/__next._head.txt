@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[59374,["/dash/_next/static/chunks/023c70df34ed28b2.js","/dash/_next/static/chunks/a4c607288b1ec87c.js"],"ViewportBoundary"]
+3:I[59374,["/dash/_next/static/chunks/023c70df34ed28b2.js","/dash/_next/static/chunks/a4c607288b1ec87c.js"],"MetadataBoundary"]
+4:"$Sreact.suspense"
+0:{"buildId":"nAS324AfS5NFsAH-WBWhY","rsc":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L2",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","media":"(prefers-color-scheme: light)","content":"#f5f6f8"}],["$","meta","3",{"name":"theme-color","media":"(prefers-color-scheme: dark)","content":"#0a0c10"}]]}],["$","div",null,{"hidden":true,"children":["$","$L3",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"N.I.N.A. Dashboard"}],["$","meta","1",{"name":"description","content":"Real-time monitoring dashboard for N.I.N.A. astrophotography software"}]]}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"loading":null,"isPartial":false}
