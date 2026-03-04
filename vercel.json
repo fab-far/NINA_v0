@@ -6,12 +6,5 @@
             "source": "/dash/(.*)",
             "destination": "/$1"
         }
-    ],
-    "redirects": [
-        {
-            "source": "/",
-            "destination": "/dash/",
-            "permanent": false
-        }
     ]
 }
