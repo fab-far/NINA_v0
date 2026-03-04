@@ -1,0 +1,17 @@
+{
+    "cleanUrls": true,
+    "trailingSlash": true,
+    "rewrites": [
+        {
+            "source": "/dash/(.*)",
+            "destination": "/$1"
+        }
+    ],
+    "redirects": [
+        {
+            "source": "/",
+            "destination": "/dash/",
+            "permanent": false
+        }
+    ]
+}
