@@ -17,3 +17,4 @@ api-1.json
 
 # VS Code
 .vscode/
+.vercel
