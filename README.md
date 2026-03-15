@@ -1,8 +1,8 @@
 # NINA Dashboard v0
 
-A modern, fast, and beautiful web dashboard for [N.I.N.A. (Nighttime Imaging 'N' Astronomy)](https://nina.astrophotography.app/). Monitor your astrophotography sessions in real-time from any device in your network.
+A modern, fast, and beautiful web dashboard for [N.I.N.A. (Nighttime Imaging 'N' Astronomy)](https://nighttime-imaging.eu/). Monitor your astrophotography sessions in real-time from any device in your network.
 
-![NINA Dashboard](https://raw.githubusercontent.com/fab-far/NINA_v0/main/public/placeholder-hero.png)
+![NINA Dashboard](./Screenshot.png)
 
 ## 🚀 Key Features
 
