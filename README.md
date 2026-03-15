@@ -77,6 +77,17 @@ For the most reliable experience and to avoid browser security restrictions (lik
 
    You can now access the dashboard from any browser on your network by typing: `http://<IP-DEL-NINAPC>:8080`.
 
+### Option C: Hosted via Vercel (Quick Access)
+
+If you don't want to run or build the application yourself, you can use the hosted version of the dashboard directly from any browser:
+
+1. Open [https://nina-v0.vercel.app/](https://nina-v0.vercel.app/)
+2. Open the Settings panel (gear icon) and configure your NINA PC's local IP address and port:
+
+![Dashboard Settings](./settings.png)
+
+*(Note: Depending on your browser, strict "Private Network Access" security blocks may prevent a public website like Vercel from talking to a local IP like `192.168.x.x`. If the data briefly appears and then fails with "Failed to fetch", use Option B or Option A instead).*
+
 ## 🔗 N.I.N.A. Configuration Requirements
 
 This dashboard requires the **NINA Advanced API Plugin** to be installed and enabled in N.I.N.A.
