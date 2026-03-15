@@ -28,6 +28,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  Tooltip as RadixTooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useNina } from "@/lib/nina-context"
 import { useNinaPolling } from "@/lib/use-nina-polling"
 import {
@@ -208,45 +214,25 @@ function getEccentricityColor(ecc: number) {
 }
 
 export function ImagePanel() {
-  const { settings, addApiLog, sessionData } = useNina()
+  const {
+    settings,
+    addApiLog,
+    sessionData,
+    imageHistory: data,
+    camera: cameraData,
+    isPollingLoading: isLoading,
+    pollingError: error
+  } = useNina()
+
+  const [zoom, setZoom] = useState(1)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [startPan, setStartPan] = useState({ x: 0, y: 0 })
   const [exposureProgress, setExposureProgress] = useState({ progress: 0, remaining: 0 })
   const [showHistogram, setShowHistogram] = useState(false)
   const [historyIndex, setHistoryIndex] = useState<number | null>(null)
   const [displayedDialogIndex, setDisplayedDialogIndex] = useState<number | null>(null)
   const [isBlobLoading, setIsBlobLoading] = useState(false)
-
-  // Polling per image history
-  const historyFetcher = useCallback(
-    (signal: AbortSignal, onLog?: import("@/lib/nina-api").ApiLogCallback) =>
-      getImageHistory(settings.host, settings.port, signal, onLog),
-    [settings.host, settings.port]
-  )
-
-  const { data, error, isLoading } = useNinaPolling({
-    fetcher: historyFetcher,
-    interval: settings.imagePollingInterval,
-    enabled: true,
-    onLog: addApiLog,
-  })
-
-  // Auto-reset to live mode when new data arrives
-  useEffect(() => {
-    if (data && data.length > 0) {
-      setHistoryIndex(null)
-    }
-  }, [data?.length])
-
-  // Polling per camera info (per la progress bar)
-  const cameraFetcher = useCallback(
-    (signal: AbortSignal) => getCameraInfo(settings.host, settings.port, signal),
-    [settings.host, settings.port]
-  )
-
-  const { data: cameraData } = useNinaPolling({
-    fetcher: cameraFetcher,
-    interval: settings.pollingInterval,
-    enabled: true,
-  })
 
   // -- LiveStack States --
   const [isLiveStackMode, setIsLiveStackMode] = useState(false)
@@ -447,10 +433,6 @@ export function ImagePanel() {
   }, [blobUrl])
 
   // Fullscreen state
-  const [zoom, setZoom] = useState(1)
-  const [position, setPosition] = useState({ x: 0, y: 0 })
-  const [isDragging, setIsDragging] = useState(false)
-  const [startPan, setStartPan] = useState({ x: 0, y: 0 })
   const [showInspector, setShowInspector] = useState(false)
 
 
@@ -573,23 +555,32 @@ export function ImagePanel() {
             </div>
           )}
 
-          <Button
-            variant="outline"
-            size="sm"
-            className={cn(
-              "h-6 px-2 text-[9px] font-mono uppercase tracking-widest transition-all",
-              isLiveStackLoading ? "opacity-50 cursor-wait" : "bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary hover:text-primary"
-            )}
-            onClick={handleLiveStackClick}
-            disabled={isLiveStackLoading}
-          >
-            {isLiveStackLoading ? (
-              <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
-            ) : (
-              <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse mr-1.5" />
-            )}
-            LiveStack
-          </Button>
+          <TooltipProvider>
+            <RadixTooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-6 px-2 text-[9px] font-mono uppercase tracking-widest transition-all",
+                    isLiveStackLoading ? "opacity-50 cursor-wait" : "bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary hover:text-primary"
+                  )}
+                  onClick={handleLiveStackClick}
+                  disabled={isLiveStackLoading}
+                >
+                  {isLiveStackLoading ? (
+                    <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
+                  ) : (
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse mr-1.5" />
+                  )}
+                  LiveStack
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-popover text-popover-foreground">
+                <p className="text-xs">LiveStack Preview</p>
+              </TooltipContent>
+            </RadixTooltip>
+          </TooltipProvider>
 
           <span className="text-[10px] font-mono bg-muted/40 px-2 py-0.5 rounded border border-border/50 text-muted-foreground tabular-nums">
             {activeIndex !== null ? `Frame #${activeIndex}` : "--"}

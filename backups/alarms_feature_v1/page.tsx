@@ -10,10 +10,6 @@ import { MountPanel } from "@/components/dashboard/mount-panel"
 import { DashboardHeader } from "@/components/dashboard/header"
 import { LogPanel } from "@/components/dashboard/log-panel"
 import BatteryPanel from "@/components/dashboard/battery-panel"
-import { NotificationManager } from "../components/dashboard/notification-manager"
-import { AlarmDrawer } from "@/components/dashboard/alarm-drawer"
-import { DynamicFavicon } from "@/components/dashboard/dynamic-favicon"
-import { TransferDialog } from "@/components/dashboard/transfer-dialog"
 import { Button } from "@/components/ui/button"
 import { useNina } from "@/lib/nina-context"
 import { getCameraInfo } from "@/lib/nina-api"
@@ -110,10 +106,7 @@ export default function DashboardPage() {
 
   // UNIFIED RENDERING FOR STABILITY
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden font-sans">
-      <DynamicFavicon />
-      <NotificationManager />
-      <AlarmDrawer />
+    <div className="relative h-screen w-screen overflow-hidden bg-background">
       {/* 1. STABLE PLACEHOLDER LAYER */}
       <div id="pip-placeholder-mount" className="z-50 absolute inset-0 pointer-events-none">
         {pipWindow && (
@@ -178,7 +171,7 @@ export default function DashboardPage() {
                       <PanelGroup direction="vertical" autoSaveId="nina-v6-central-stack">
                         <Panel defaultSize={65} minSize={30} className="p-0.5"><ImagePanel /></Panel>
                         <ResizeHandle direction="vertical" />
-                        <Panel defaultSize={35} minSize={10} className="p-0.5 min-h-0"><GuiderPanel /></Panel>
+                        <Panel defaultSize={35} minSize={10} className="p-0.5"><GuiderPanel /></Panel>
                       </PanelGroup>
                     </Panel>
                     <ResizeHandle direction="horizontal" />

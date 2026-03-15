@@ -233,29 +233,6 @@ export interface ImageHistoryItem {
   GuidingRMSDECArcSec?: number
 }
 
-// -- Alarm System --
-export type AlarmLevel = "INFO" | "WARNING" | "CRITICAL"
-
-export type AlarmSource =
-  | "COOLING_OFF"
-  | "GUIDING_LOST"
-  | "GUIDING_HIGH_RMS"
-  | "STAR_DROP_WARNING"
-  | "STAR_DROP_CRITICAL"
-  | "BATTERY_LOW"
-
-export interface AlarmEntry {
-  id: string
-  timestamp: Date
-  level: AlarmLevel
-  source: AlarmSource
-  message: string
-  /** true se l'utente ha premuto ACK su questo allarme */
-  acked: boolean
-  /** true se la condizione è rientrata (dato tornato normale) */
-  resolved: boolean
-}
-
 // -- API Log Entry --
 export interface ApiLogEntry {
   id: number
@@ -289,11 +266,6 @@ export interface NinaConnectionSettings {
   imageDebayer: boolean
   imageAutoprepared: boolean
   showApiLog: boolean
-  guidingRmsThreshold: number
-  starCountDropThreshold: number
-  enableAudioAlarms: boolean
-  enableAudioNotifications: boolean
-  batteryVoltageThreshold: number
 }
 
 export const DEFAULT_SETTINGS: NinaConnectionSettings = {
@@ -313,20 +285,6 @@ export const DEFAULT_SETTINGS: NinaConnectionSettings = {
   imageDebayer: true,
   imageAutoprepared: true,
   showApiLog: true,
-  guidingRmsThreshold: 8.0,
-  starCountDropThreshold: 50,
-  enableAudioAlarms: true,
-  enableAudioNotifications: true,
-  batteryVoltageThreshold: 11.8,
-}
-export interface BatteryResponse {
-  status: "idle" | "starting" | "running" | "error"
-  message?: string
-  battery_voltage: number
-  load_current: number
-  load_watt: number
-  consumed_wh: number
-  yield_today: number
 }
 
 // -- LiveStack --

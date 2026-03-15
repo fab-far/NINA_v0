@@ -15,14 +15,12 @@ import {
     ReferenceArea,
 } from "recharts"
 import { useNina } from "@/lib/nina-context"
-import { useNinaPolling } from "@/lib/use-nina-polling"
-import { getMountInfo } from "@/lib/nina-api"
 import { generateAltitudeData } from "@/lib/astro-utils"
 import { StatusBadge } from "./status-badge"
 import { formatNumber } from "@/lib/utils"
 
 export function AltitudeChart() {
-    const { settings, addApiLog } = useNina()
+    const { settings, addApiLog, mount: mountData, isPollingLoading: isLoading } = useNina()
     const [currentTime, setCurrentTime] = React.useState(new Date())
 
     // Internal clock to move "Now" line independently of polling
@@ -32,13 +30,6 @@ export function AltitudeChart() {
         }, 30000) // Update every 30 seconds
         return () => clearInterval(timer)
     }, [])
-
-    const { data: mountData, isLoading } = useNinaPolling({
-        fetcher: (signal, onLog) => getMountInfo(settings.host, settings.port, signal, onLog),
-        interval: settings.pollingInterval,
-        enabled: true,
-        onLog: addApiLog,
-    })
 
     // Calculate Chart Start Time (Noon of current astronomical day)
     const startTime = useMemo(() => {

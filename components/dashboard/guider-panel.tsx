@@ -45,23 +45,9 @@ const POINT_OPTIONS = [
 
 
 export function GuiderPanel() {
-  const { settings, updateSettings, addApiLog } = useNina()
+  const { settings, updateSettings, addApiLog, guider: guiderInfo, isPollingLoading: infoLoading, pollingError: infoError } = useNina()
   const [pointCount, setPointCount] = useState(String(settings.guideGraphPoints))
   const [unit, setUnit] = useState<"px" | "arcsec">(settings.guideUnit || "arcsec")
-
-  const infoFetcher = useCallback(
-    (signal: AbortSignal, onLog?: import("@/lib/nina-api").ApiLogCallback) =>
-      getGuiderInfo(settings.host, settings.port, signal, onLog),
-    [settings.host, settings.port]
-  )
-
-  const { data: guiderInfo, error: infoError, isLoading: infoLoading } =
-    useNinaPolling({
-      fetcher: infoFetcher,
-      interval: settings.pollingInterval,
-      enabled: true,
-      onLog: addApiLog,
-    })
 
   const graphFetcher = useCallback(
     (signal: AbortSignal, onLog?: import("@/lib/nina-api").ApiLogCallback) =>
@@ -197,7 +183,7 @@ export function GuiderPanel() {
           )}
         </div>
       </CardHeader>
-      <CardContent className="flex-1 p-0 overflow-hidden flex flex-col">
+      <CardContent className="flex-1 p-0 overflow-hidden flex flex-col min-h-0">
         {infoLoading ? (
           <div className="p-3 flex flex-col gap-2 flex-1">
             <Skeleton className="flex-1 w-full rounded" />
@@ -214,28 +200,30 @@ export function GuiderPanel() {
         ) : (
           <>
             {/* Guide Graph */}
-            <div className="flex-1 min-h-[80px] p-2 bg-muted/5 relative">
+            <div className="flex-1 min-h-0 bg-muted/5 relative">
               {chartData.length > 0 ? (
                 <>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={chartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.3} vertical={false} />
-                      <XAxis dataKey="index" tick={false} axisLine={false} tickLine={false} height={0} />
-                      <YAxis
-                        tick={{ fontSize: 8, fill: "hsl(var(--muted-foreground))", fontFamily: "var(--font-geist-mono)" }}
-                        axisLine={false}
-                        tickLine={false}
-                        domain={unit === "arcsec" ? [-2, 2] : [-1, 1]}
-                      />
-                      <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" strokeOpacity={0.4} />
-                      <Line type="monotone" dataKey="ra" stroke="hsl(210, 80%, 60%)" strokeWidth={1.5} dot={false} isAnimationActive={false} />
-                      <Line type="monotone" dataKey="dec" stroke="hsl(0, 80%, 60%)" strokeWidth={1.5} dot={false} isAnimationActive={false} />
-                      <Tooltip
-                        content={<CustomTooltip unit={unit} />}
-                        position={{ y: 0 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  <div className="absolute inset-0 p-2">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.3} vertical={false} />
+                        <XAxis dataKey="index" tick={false} axisLine={false} tickLine={false} height={0} />
+                        <YAxis
+                          tick={{ fontSize: 8, fill: "hsl(var(--muted-foreground))", fontFamily: "var(--font-geist-mono)" }}
+                          axisLine={false}
+                          tickLine={false}
+                          domain={unit === "arcsec" ? [-2, 2] : [-1, 1]}
+                        />
+                        <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" strokeOpacity={0.4} />
+                        <Line type="monotone" dataKey="ra" stroke="hsl(210, 80%, 60%)" strokeWidth={1.5} dot={false} isAnimationActive={false} />
+                        <Line type="monotone" dataKey="dec" stroke="hsl(0, 80%, 60%)" strokeWidth={1.5} dot={false} isAnimationActive={false} />
+                        <Tooltip
+                          content={<CustomTooltip unit={unit} />}
+                          position={{ y: 0 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
                   {/* Scale Overlay */}
                   <div className="absolute top-2 right-4 text-[8px] font-mono text-muted-foreground/50 pointer-events-none">
                     Scale: {unit === "arcsec" ? '±2"' : "±1px"}

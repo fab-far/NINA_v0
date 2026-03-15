@@ -139,7 +139,34 @@ export async function getSequenceState(
   signal?: AbortSignal,
   onLog?: ApiLogCallback
 ): Promise<SequenceState> {
-  return fetchNina<SequenceState>(host, port, "/sequence/json", signal, onLog)
+  return fetchNina<SequenceState>(host, port, "/sequence/state", signal, onLog)
+}
+
+export async function startSequence(
+  host: string,
+  port: number,
+  signal?: AbortSignal,
+  onLog?: ApiLogCallback
+): Promise<void> {
+  return fetchNina<void>(host, port, "/sequence/start?skipValidation=true", signal, onLog)
+}
+
+export async function stopSequence(
+  host: string,
+  port: number,
+  signal?: AbortSignal,
+  onLog?: ApiLogCallback
+): Promise<void> {
+  return fetchNina<void>(host, port, "/sequence/stop", signal, onLog)
+}
+
+export async function resetSequence(
+  host: string,
+  port: number,
+  signal?: AbortSignal,
+  onLog?: ApiLogCallback
+): Promise<void> {
+  return fetchNina<void>(host, port, "/sequence/reset", signal, onLog)
 }
 
 // -- Image History --

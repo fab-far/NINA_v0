@@ -9,35 +9,12 @@ import { getBatteryStatus, BatteryResponse } from "@/lib/transfer-api"
 import { cn, formatNumber } from "@/lib/utils"
 
 export default function BatteryPanel() {
-    const { settings, isConnected, addApiLog } = useNina()
-    const [data, setData] = useState<BatteryResponse | null>(null)
-    const [error, setError] = useState<string | null>(null)
+    const { settings, isConnected, addApiLog, battery: data, pollingError: error } = useNina()
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
 
-    const pollBattery = async (signal?: AbortSignal) => {
-        try {
-            const batteryData = await getBatteryStatus(settings.host, settings.transferPort, signal, addApiLog)
-            setData(batteryData)
-            setLastUpdate(new Date())
-            setError(null)
-        } catch (err) {
-            if (err instanceof DOMException && err.name === "AbortError") return
-            console.error("[BatteryPanel] Fetch error:", err)
-            setError(err instanceof Error ? err.message : "Connection Error")
-        }
-    }
-
     useEffect(() => {
-        const controller = new AbortController()
-
-        pollBattery(controller.signal)
-        const interval = setInterval(() => pollBattery(controller.signal), 15000)
-
-        return () => {
-            controller.abort()
-            clearInterval(interval)
-        }
-    }, [settings.host, settings.transferPort])
+        if (data) setLastUpdate(new Date())
+    }, [data])
 
     const stats = useMemo(() => {
         if (!data || data.status !== "running") return null

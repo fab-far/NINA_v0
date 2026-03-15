@@ -43,6 +43,9 @@ export function ConnectionDialog({ open, onOpenChange }: ConnectionDialogProps) 
   const [enableTransfer, setEnableTransfer] = useState(settings.enableTransfer)
   const [showBatteryPanel, setShowBatteryPanel] = useState(settings.showBatteryPanel)
   const [showApiLog, setShowApiLog] = useState(settings.showApiLog)
+  const [enableAudioAlarms, setEnableAudioAlarms] = useState(settings.enableAudioAlarms)
+  const [enableAudioNotifications, setEnableAudioNotifications] = useState(settings.enableAudioNotifications)
+  const [batteryVoltageThreshold, setBatteryVoltageThreshold] = useState(String(settings.batteryVoltageThreshold))
 
   // Image Load Parameters State
   const [imageResize, setImageResize] = useState(settings.imageResize)
@@ -51,6 +54,10 @@ export function ConnectionDialog({ open, onOpenChange }: ConnectionDialogProps) 
   const [imageQuality, setImageQuality] = useState(String(settings.imageQuality))
   const [imageDebayer, setImageDebayer] = useState(settings.imageDebayer)
   const [imageAutoprepared, setImageAutoprepared] = useState(settings.imageAutoprepared)
+
+  // Alarm Thresholds State
+  const [guidingRmsThreshold, setGuidingRmsThreshold] = useState(String(settings.guidingRmsThreshold))
+  const [starCountDropThreshold, setStarCountDropThreshold] = useState(String(settings.starCountDropThreshold))
 
   useEffect(() => {
     if (open) {
@@ -68,6 +75,11 @@ export function ConnectionDialog({ open, onOpenChange }: ConnectionDialogProps) 
       setEnableTransfer(settings.enableTransfer)
       setShowBatteryPanel(settings.showBatteryPanel)
       setShowApiLog(settings.showApiLog)
+      setGuidingRmsThreshold(String(settings.guidingRmsThreshold))
+      setStarCountDropThreshold(String(settings.starCountDropThreshold))
+      setEnableAudioAlarms(settings.enableAudioAlarms)
+      setEnableAudioNotifications(settings.enableAudioNotifications)
+      setBatteryVoltageThreshold(String(settings.batteryVoltageThreshold))
     }
   }, [open, settings])
 
@@ -87,6 +99,11 @@ export function ConnectionDialog({ open, onOpenChange }: ConnectionDialogProps) 
       transferPort: Number.parseInt(transferPort, 10) || 8181,
       showBatteryPanel,
       showApiLog,
+      guidingRmsThreshold: Number.parseFloat(guidingRmsThreshold) || 8.0,
+      starCountDropThreshold: Number.parseInt(starCountDropThreshold, 10) || 50,
+      enableAudioAlarms,
+      enableAudioNotifications,
+      batteryVoltageThreshold: Number.parseFloat(batteryVoltageThreshold) || 11.8,
     })
     onOpenChange(false)
   }
@@ -100,6 +117,7 @@ export function ConnectionDialog({ open, onOpenChange }: ConnectionDialogProps) 
             Configure connection and image processing parameters.
           </DialogDescription>
         </DialogHeader>
+
         <TooltipProvider>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-2">
             {/* Left Column: Connection & Transfer */}
@@ -253,8 +271,96 @@ export function ConnectionDialog({ open, onOpenChange }: ConnectionDialogProps) 
               </div>
             </div>
 
-            {/* Right Column: Image Load Parameters */}
+            {/* Right Column: Alarms & Image Parameters */}
             <div className="space-y-6">
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">Alarms & Thresholds</h4>
+
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <Label htmlFor="rmsThreshold" className="text-[10px] uppercase font-bold text-muted-foreground">Guiding RMS</Label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-3 w-3 text-muted-foreground/50 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="text-[10px] max-w-[200px]">
+                          Trigger alarm if Guiding Total RMS (arcsec) exceeds this value during exposure.
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <Input id="rmsThreshold" type="number" step="0.1" value={guidingRmsThreshold} onChange={(e) => setGuidingRmsThreshold(e.target.value)} className="h-8 font-mono text-xs" />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <Label htmlFor="starThreshold" className="text-[10px] uppercase font-bold text-muted-foreground">Star Drop (%)</Label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-3 w-3 text-muted-foreground/50 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="text-[10px] max-w-[200px]">
+                          Trigger alarm if star count drops by more than this percentage vs average.
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <Input id="starThreshold" type="number" min="1" max="100" value={starCountDropThreshold} onChange={(e) => setStarCountDropThreshold(e.target.value)} className="h-8 font-mono text-xs" />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Label htmlFor="batteryThreshold" className="text-[10px] uppercase font-bold text-muted-foreground">Battery Voltage (V)</Label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3 w-3 text-muted-foreground/50 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-[10px] max-w-[200px]">
+                        If battery monitoring is active, trigger WARNING alarm if voltage drops below this threshold. CRITICAL if it drops further by 0.3V.
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <Input id="batteryThreshold" type="number" step="0.1" value={batteryVoltageThreshold} onChange={(e) => setBatteryVoltageThreshold(e.target.value)} className="h-8 font-mono text-xs max-w-[120px]" />
+                </div>
+              </div>
+
+              <Separator className="bg-border/50" />
+
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">Sounds and TTS notifications</h4>
+
+                <div className="flex items-center justify-between bg-muted/30 p-2 rounded-md border border-border/50">
+                  <div className="flex items-center gap-1.5">
+                    <Label className="text-xs font-medium">Enable Audio Alarms</Label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3 w-3 text-muted-foreground/50 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-[10px] max-w-[200px]">
+                        Enable voice alerts and continuous sound alarms. Visual monitoring remains always active.
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <Switch checked={enableAudioAlarms} onCheckedChange={setEnableAudioAlarms} />
+                </div>
+
+                <div className="flex items-center justify-between bg-muted/30 p-2 rounded-md border border-border/50">
+                  <div className="flex items-center gap-1.5">
+                    <Label className="text-xs font-medium">Enable Notification Audio</Label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3 w-3 text-muted-foreground/50 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-[10px] max-w-[200px]">
+                        Enable voice alerts for session events like completed exposures.
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <Switch checked={enableAudioNotifications} onCheckedChange={setEnableAudioNotifications} />
+                </div>
+              </div>
+
+              <Separator className="bg-border/50" />
+
               <div className="space-y-4">
                 <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">Image Load Parameters</h4>
 
@@ -354,6 +460,7 @@ export function ConnectionDialog({ open, onOpenChange }: ConnectionDialogProps) 
             </div>
           </div>
         </TooltipProvider>
+
         <DialogFooter className="mt-4">
           <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="text-xs">
             Cancel

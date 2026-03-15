@@ -5,27 +5,12 @@ import { Compass, Navigation, MapPin, Activity, Map, Timer } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useNina } from "@/lib/nina-context"
-import { useNinaPolling } from "@/lib/use-nina-polling"
-import { getMountInfo } from "@/lib/nina-api"
 import { StatusBadge } from "./status-badge"
 import { cn } from "@/lib/utils"
 import { SkyMap } from "./sky-map"
 
 export function MountPanel() {
-    const { settings, addApiLog } = useNina()
-
-    const fetcher = useCallback(
-        (signal: AbortSignal, onLog?: import("@/lib/nina-api").ApiLogCallback) =>
-            getMountInfo(settings.host, settings.port, signal, onLog),
-        [settings.host, settings.port]
-    )
-
-    const { data, error, isLoading } = useNinaPolling({
-        fetcher,
-        interval: settings.pollingInterval,
-        enabled: true,
-        onLog: addApiLog,
-    })
+    const { settings, addApiLog, mount: data, isPollingLoading: isLoading, pollingError: error } = useNina()
 
     // Format SideOfPier to be more readable
     const formatPierSide = (side: string | undefined) => {
@@ -90,6 +75,10 @@ export function MountPanel() {
                                 <SkyMap
                                     altitude={data.Altitude}
                                     azimuth={data.Azimuth}
+                                    siteLatitude={data.SiteLatitude}
+                                    siderealTime={data.SiderealTime}
+                                    targetRa={data.RightAscension}
+                                    targetDec={data.Declination}
                                     className="flex-1"
                                 />
                             </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTheme } from "next-themes"
-import { Settings, Moon, Sun, Telescope, Wifi, WifiOff, HardDriveDownload, Info } from "lucide-react"
+import { Settings, Moon, Sun, Telescope, Wifi, WifiOff, HardDriveDownload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
 import { useNina } from "@/lib/nina-context"
@@ -10,13 +10,10 @@ import { ConnectionDialog } from "./connection-dialog"
 import { StatusBadge } from "./status-badge"
 import { TransferDialog } from "./transfer-dialog"
 import { PiPToggle } from "./pip-toggle"
-import { AlarmStatusIcon } from "./alarm-status-icon"
-import { AboutDialog } from "./about-dialog"
 
 export function DashboardHeader() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [transferOpen, setTransferOpen] = useState(false)
-  const [aboutOpen, setAboutOpen] = useState(false)
   const { theme, setTheme } = useTheme()
   const { settings, isConnected, connectionError } = useNina()
 
@@ -75,7 +72,6 @@ export function DashboardHeader() {
             </TooltipContent>
           </Tooltip>
 
-          <AlarmStatusIcon />
           <PiPToggle />
 
           {settings.enableTransfer && (
@@ -113,28 +109,10 @@ export function DashboardHeader() {
               <p className="text-xs">Settings</p>
             </TooltipContent>
           </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                onClick={() => setAboutOpen(true)}
-              >
-                <Info className="h-4 w-4" />
-                <span className="sr-only">About</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent className="bg-popover text-popover-foreground">
-              <p className="text-xs">About</p>
-            </TooltipContent>
-          </Tooltip>
         </div>
 
         <ConnectionDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
         {settings.enableTransfer && <TransferDialog open={transferOpen} onOpenChange={setTransferOpen} />}
-        <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} />
       </header >
     </TooltipProvider >
   )
