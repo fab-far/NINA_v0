@@ -221,7 +221,7 @@ export function ImagePanel() {
     imageHistory: data,
     camera: cameraData,
     isPollingLoading: isLoading,
-    pollingError: error
+    historyError: error
   } = useNina()
 
   const [zoom, setZoom] = useState(1)

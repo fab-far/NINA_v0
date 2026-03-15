@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils"
 import { SkyMap } from "./sky-map"
 
 export function MountPanel() {
-    const { settings, addApiLog, mount: data, isPollingLoading: isLoading, pollingError: error } = useNina()
+    const { settings, addApiLog, mount: data, isPollingLoading: isLoading, mountError: error } = useNina()
 
     // Format SideOfPier to be more readable
     const formatPierSide = (side: string | undefined) => {

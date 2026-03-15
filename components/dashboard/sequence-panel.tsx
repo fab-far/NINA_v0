@@ -345,7 +345,7 @@ function SequenceNode({ item, depth = 0, isWide = false }: { item: SequenceItem;
 }
 
 export function SequencePanel() {
-  const { settings, isConnected, addApiLog, updateSessionData, sequence: data, isPollingLoading: isLoading, pollingError: error } = useNina()
+  const { settings, isConnected, addApiLog, updateSessionData, sequence: data, isPollingLoading: isLoading, sequenceError: error } = useNina()
   const [fullscreenOpen, setFullscreenOpen] = useState(false)
 
   // Helper to check if any item in the tree is running

@@ -9,7 +9,7 @@ import { getBatteryStatus, BatteryResponse } from "@/lib/transfer-api"
 import { cn, formatNumber } from "@/lib/utils"
 
 export default function BatteryPanel() {
-    const { settings, isConnected, addApiLog, battery: data, pollingError: error } = useNina()
+    const { settings, isConnected, addApiLog, battery: data, batteryError: error } = useNina()
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
 
     useEffect(() => {

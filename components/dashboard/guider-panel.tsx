@@ -45,7 +45,7 @@ const POINT_OPTIONS = [
 
 
 export function GuiderPanel() {
-  const { settings, updateSettings, addApiLog, guider: guiderInfo, isPollingLoading: infoLoading, pollingError: infoError } = useNina()
+  const { settings, updateSettings, addApiLog, guider: guiderInfo, isPollingLoading: infoLoading, guiderError: infoError } = useNina()
   const [pointCount, setPointCount] = useState(String(settings.guideGraphPoints))
   const [unit, setUnit] = useState<"px" | "arcsec">(settings.guideUnit || "arcsec")
 

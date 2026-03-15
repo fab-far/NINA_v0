@@ -77,6 +77,12 @@ interface NinaContextValue {
   battery: BatteryResponse | null
   isPollingLoading: boolean
   pollingError: string | null
+  cameraError: string | null
+  guiderError: string | null
+  historyError: string | null
+  sequenceError: string | null
+  mountError: string | null
+  batteryError: string | null
 }
 
 const NinaContext = createContext<NinaContextValue | null>(null)
@@ -209,7 +215,7 @@ export function NinaProvider({ children }: { children: ReactNode }) {
   const { data: battery, error: batteryError, isLoading: batteryLoading } = useNinaPolling({
     fetcher: batteryFetcher,
     interval: 15000,
-    enabled: isConnected && settings.enableTransfer,
+    enabled: isConnected && settings.enableTransfer && settings.showBatteryPanel,
   })
 
   const mountFetcher = useCallback(
@@ -356,6 +362,12 @@ export function NinaProvider({ children }: { children: ReactNode }) {
         battery,
         isPollingLoading,
         pollingError,
+        cameraError,
+        guiderError,
+        historyError,
+        sequenceError,
+        mountError,
+        batteryError,
         activeAlarms,
         alarmLog,
         raiseAlarm,
