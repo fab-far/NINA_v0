@@ -27,7 +27,7 @@ This dashboard provides a comprehensive view of your entire astrophotography set
 
 ## 📥 Installation & Usage
 
-You have two main ways to run the NINA Dashboard: locally on your PC (for development/testing), or as a static build served directly from the NINA PC (recommended).
+You have 3 main ways to run the NINA Dashboard: locally on your PC (for development/testing), or as a static build served directly from the NINA PC (recommended).
 
 ### Option A: Running via Node.js (Development)
 

@@ -4,6 +4,7 @@ import React, { useCallback } from "react"
 import { Compass, Navigation, MapPin, Activity, Map, Timer } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useNina } from "@/lib/nina-context"
 import { StatusBadge } from "./status-badge"
 import { cn } from "@/lib/utils"
@@ -71,16 +72,39 @@ export function MountPanel() {
                             </div>
 
                             {/* Column 3: Sky Map */}
-                            <div className="flex flex-col h-full">
-                                <SkyMap
-                                    altitude={data.Altitude}
-                                    azimuth={data.Azimuth}
-                                    siteLatitude={data.SiteLatitude}
-                                    siderealTime={data.SiderealTime}
-                                    targetRa={data.RightAscension}
-                                    targetDec={data.Declination}
-                                    className="flex-1"
-                                />
+                            <div className="flex flex-col h-full min-h-0">
+                                <Dialog>
+                                    <DialogTrigger className="flex-1 flex flex-col cursor-pointer transition-opacity hover:opacity-80 rounded ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-h-0 text-left border-0 bg-transparent p-0 m-0">
+                                        <SkyMap
+                                            altitude={data.Altitude}
+                                            azimuth={data.Azimuth}
+                                            siteLatitude={data.SiteLatitude}
+                                            siderealTime={data.SiderealTime}
+                                            targetRa={data.RightAscension}
+                                            targetDec={data.Declination}
+                                            className="h-full"
+                                        />
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-3xl w-[95vw] sm:w-[80vw] mx-auto p-4 sm:p-6 !rounded-xl bg-background/95 backdrop-blur-md border-border/50 shadow-2xl">
+                                        <DialogHeader>
+                                            <DialogTitle className="font-mono uppercase text-sm text-foreground/80 tracking-widest">
+                                                Sky Map
+                                            </DialogTitle>
+                                        </DialogHeader>
+                                        <div className="w-full aspect-square sm:aspect-video mt-2 relative">
+                                            <SkyMap
+                                                altitude={data.Altitude}
+                                                azimuth={data.Azimuth}
+                                                siteLatitude={data.SiteLatitude}
+                                                siderealTime={data.SiderealTime}
+                                                targetRa={data.RightAscension}
+                                                targetDec={data.Declination}
+                                                className="absolute inset-0 w-full h-full !border-0 bg-transparent"
+                                                svgClassName="max-w-none h-full w-full"
+                                            />
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         </div>
 

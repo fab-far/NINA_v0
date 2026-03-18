@@ -13,9 +13,10 @@ interface SkyMapProps {
     targetRa?: number
     targetDec?: number
     className?: string
+    svgClassName?: string
 }
 
-export function SkyMap({ altitude, azimuth, siteLatitude, siderealTime, targetRa, targetDec, className }: SkyMapProps) {
+export function SkyMap({ altitude, azimuth, siteLatitude, siderealTime, targetRa, targetDec, className, svgClassName }: SkyMapProps) {
     // Normalize values
     const alt = Math.max(0, Math.min(90, altitude))
     const az = azimuth % 360
@@ -42,7 +43,7 @@ export function SkyMap({ altitude, azimuth, siteLatitude, siderealTime, targetRa
         <div className={cn("relative flex items-center justify-center bg-muted/10 rounded-lg border border-border/30", className)}>
             <svg
                 viewBox={`0 0 ${size} ${size}`}
-                className="w-full h-full max-w-[120px]"
+                className={cn("w-full h-full max-w-[120px]", svgClassName)}
             >
                 {/* Outer boundary (Horizon) */}
                 <circle
