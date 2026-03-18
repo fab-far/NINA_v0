@@ -133,6 +133,26 @@ export async function getGuiderGraph(
 }
 
 // -- Sequence --
+export async function getAvailableSequences(
+  host: string,
+  port: number,
+  signal?: AbortSignal,
+  onLog?: ApiLogCallback
+): Promise<string[]> {
+  return fetchNina<string[]>(host, port, "/sequence/list-available", signal, onLog)
+}
+
+export async function loadSequence(
+  host: string,
+  port: number,
+  sequenceName: string,
+  signal?: AbortSignal,
+  onLog?: ApiLogCallback
+): Promise<string> {
+  const encodedName = encodeURIComponent(sequenceName)
+  return fetchNina<string>(host, port, `/sequence/load?sequenceName=${encodedName}`, signal, onLog)
+}
+
 export async function getSequenceState(
   host: string,
   port: number,

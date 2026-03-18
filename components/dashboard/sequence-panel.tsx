@@ -54,7 +54,14 @@ import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
 import { useNina } from "@/lib/nina-context"
 import { useNinaPolling } from "@/lib/use-nina-polling"
-import { getSequenceState, startSequence, stopSequence, resetSequence } from "@/lib/nina-api"
+import { getSequenceState, startSequence, stopSequence, resetSequence, getAvailableSequences, loadSequence } from "@/lib/nina-api"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import type { SequenceItem, SequenceItemStatus } from "@/lib/nina-types"
 import { StatusBadge } from "./status-badge"
 import { cn } from "@/lib/utils"
@@ -347,6 +354,40 @@ function SequenceNode({ item, depth = 0, isWide = false }: { item: SequenceItem;
 export function SequencePanel() {
   const { settings, isConnected, addApiLog, updateSessionData, sequence: data, isPollingLoading: isLoading, sequenceError: error } = useNina()
   const [fullscreenOpen, setFullscreenOpen] = useState(false)
+  const [availableSequences, setAvailableSequences] = useState<string[]>([])
+  const [isSequencesLoading, setIsSequencesLoading] = useState(false)
+  const [sequenceLoadError, setSequenceLoadError] = useState<string | null>(null)
+
+  // Fetch available sequences when modal opens
+  useEffect(() => {
+    if (fullscreenOpen && isConnected) {
+      const fetchSeqs = async () => {
+        setIsSequencesLoading(true)
+        setSequenceLoadError(null)
+        try {
+          const list = await getAvailableSequences(settings.host, settings.port, undefined, addApiLog)
+          setAvailableSequences(list || [])
+        } catch (err) {
+          console.error("Failed to load available sequences:", err)
+          setSequenceLoadError("Failed to fetch sequence list")
+        } finally {
+          setIsSequencesLoading(false)
+        }
+      }
+      fetchSeqs()
+    }
+  }, [fullscreenOpen, isConnected, settings.host, settings.port, addApiLog])
+
+  const handleLoadSequence = async (name: string) => {
+    if (!isConnected) return
+    setSequenceLoadError(null)
+    try {
+      await loadSequence(settings.host, settings.port, name, undefined, addApiLog)
+    } catch (err: any) {
+      console.error("Failed to load sequence:", err)
+      setSequenceLoadError(err.message || "Failed to load sequence")
+    }
+  }
 
   // Helper to check if any item in the tree is running
   const checkIsRunning = (items: SequenceItem[]): boolean => {
@@ -433,14 +474,106 @@ export function SequencePanel() {
             </TooltipProvider>
             
             <DialogContent className="max-w-[90vw] w-[90vw] h-[85vh] p-0 bg-black/95 backdrop-blur-2xl border-white/10 flex flex-col overflow-hidden">
-              <DialogHeader className="p-6 border-b border-white/5 shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <ListTree className="h-6 w-6 text-primary" />
+              <DialogHeader className="p-4 sm:p-6 border-b border-white/5 shrink-0">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-6 w-full">
+                  {/* Left: Title */}
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <ListTree className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <DialogTitle className="text-xl font-mono font-bold text-white uppercase tracking-tight">Sequence Inspector</DialogTitle>
+                      <DialogDescription className="text-white/40 font-mono text-[10px] uppercase tracking-widest mt-1">Detailed view of all instructions</DialogDescription>
+                    </div>
                   </div>
-                  <div>
-                    <DialogTitle className="text-xl font-mono font-bold text-white uppercase tracking-tight">Sequence Inspector (Full)</DialogTitle>
-                    <DialogDescription className="text-white/40 font-mono text-[10px] uppercase tracking-widest mt-1">Detailed view of all instructions and parameters</DialogDescription>
+
+                  {/* Center: Sequence Selector */}
+                  <div className="flex-1 max-w-md w-full flex flex-col gap-1 sm:px-4 sm:border-l sm:border-r border-white/5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-mono text-white/50 uppercase tracking-widest">Load Sequence</label>
+                      {isSequencesLoading && <Loader2 className="h-3 w-3 animate-spin text-primary" />}
+                    </div>
+                    <Select disabled={!isConnected || isRunning || isSequencesLoading} onValueChange={handleLoadSequence}>
+                      <SelectTrigger className="h-8 bg-black/40 border-white/10 text-white font-mono text-xs w-full">
+                        <SelectValue placeholder={isRunning ? "Sequence is running..." : "Select a target or template..."} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover text-popover-foreground max-h-[40vh] border-border">
+                        {availableSequences.map((seq) => (
+                          <SelectItem key={seq} value={seq} className="font-mono text-xs">
+                            {seq.replace("Targets/", "🎯 ").replace("Templates/", "📄 ")}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {sequenceLoadError && (
+                      <span className="text-[9px] text-destructive font-mono mt-0.5">{sequenceLoadError}</span>
+                    )}
+                  </div>
+
+                  {/* Right: Controls */}
+                  <div className="flex items-center gap-2">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 bg-black/40 border-white/10 text-white hover:bg-white/10 hover:text-blue-400"
+                          disabled={!isConnected || isRunning}
+                        >
+                          <RotateCw className="h-4 w-4 mr-1.5" />
+                          <span className="font-mono text-xs uppercase hidden xl:inline">Reset</span>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-card text-card-foreground border-border">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="font-mono text-foreground tracking-tight">Reset Sequence</AlertDialogTitle>
+                          <AlertDialogDescription className="text-muted-foreground">
+                            Are you sure you want to reset the sequence progress?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleReset} className="font-mono text-xs bg-primary text-primary-foreground hover:bg-primary/90">Reset</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 bg-black/40 border-white/10 text-white hover:bg-white/10 hover:text-emerald-400"
+                      disabled={!isConnected || isRunning}
+                      onClick={handleStart}
+                    >
+                      <Play className="h-4 w-4 mr-1.5" />
+                      <span className="font-mono text-xs uppercase hidden xl:inline">Start</span>
+                    </Button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 bg-black/40 border-white/10 text-white hover:bg-white/10 hover:text-red-400"
+                          disabled={!isConnected || !isRunning}
+                        >
+                          <Square className="h-4 w-4 mr-1.5" />
+                          <span className="font-mono text-xs uppercase hidden xl:inline">Stop</span>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-card text-card-foreground border-border">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="font-mono text-foreground tracking-tight">Stop Sequence</AlertDialogTitle>
+                          <AlertDialogDescription className="text-muted-foreground">
+                            Are you sure you want to stop the sequence?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleStop} className="font-mono text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90">Stop</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </DialogHeader>
@@ -453,7 +586,11 @@ export function SequencePanel() {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center p-20 opacity-20 italic">No sequence data available</div>
+                  <div className="flex flex-col items-center justify-center p-20 opacity-40">
+                    <ListTree className="h-12 w-12 mb-4 opacity-50" />
+                    <p className="font-mono text-sm uppercase tracking-widest text-foreground">No sequence loaded</p>
+                    <p className="font-mono text-[10px] mt-2 opacity-70">Load a sequence from the menu above</p>
+                  </div>
                 )}
               </ScrollArea>
             </DialogContent>

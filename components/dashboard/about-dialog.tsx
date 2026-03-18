@@ -25,7 +25,7 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
           <DialogTitle className="text-xl font-bold tracking-tight font-mono">
             N.I.N.A. Dashboard
           </DialogTitle>
-          <p className="text-xs text-muted-foreground font-mono">Version 0.1.1</p>
+          <p className="text-xs text-muted-foreground font-mono">Version 0.1.2</p>
         </DialogHeader>
 
         <div className="space-y-4 py-2">

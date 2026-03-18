@@ -17,9 +17,13 @@ interface SkyMapProps {
 }
 
 export function SkyMap({ altitude, azimuth, siteLatitude, siderealTime, targetRa, targetDec, className, svgClassName }: SkyMapProps) {
+    // Ensure values are numbers to avoid NaN errors, fallback to Zenith (Alt 90, Az 0) or 0
+    const safeAlt = typeof altitude === 'number' && !isNaN(altitude) ? altitude : 90
+    const safeAz = typeof azimuth === 'number' && !isNaN(azimuth) ? azimuth : 0
+
     // Normalize values
-    const alt = Math.max(0, Math.min(90, altitude))
-    const az = azimuth % 360
+    const alt = Math.max(0, Math.min(90, safeAlt))
+    const az = safeAz % 360
 
     // SVG parameters
     const size = 100
